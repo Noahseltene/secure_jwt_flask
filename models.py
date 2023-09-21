@@ -19,7 +19,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-
 # Database ORMs
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)

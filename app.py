@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, make_response
-import uuid # for public id
+import uuid  # for public id
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from models import User, app
@@ -7,7 +7,9 @@ from middleware.jwt import token_required
 
 # User Database Route
 # this route sends back list of users
-@app.route('/user', methods =['GET'])
+
+
+@app.route('/user', methods=['GET'])
 @token_required
 def get_all_users(current_user):
 	# querying the database
@@ -22,14 +24,16 @@ def get_all_users(current_user):
 		# to the response list
 		output.append({
 			'public_id': user.public_id,
-			'name' : user.name,
-			'email' : user.email
+			'name': user.name,
+			'email': user.email
 		})
 
 	return jsonify({'users': output})
 
 # route for logging user in
-@app.route('/login', methods =['POST'])
+
+
+@app.route('/login', methods=['POST'])
 def login():
 	# creates dictionary of form data
 	auth = request.form
@@ -39,7 +43,7 @@ def login():
 		return make_response(
 			'Could not verify',
 			401,
-			{'WWW-Authenticate' : 'Basic realm ="Login required !!"'}
+			{'WWW-Authenticate': 'Basic realm ="Login required !!"'}
 		)
 
 	user = User.query\
@@ -58,12 +62,12 @@ def login():
 		# generates the JWT Token
 		token = jwt.encode({
 			'public_id': user.public_id,
-			'exp' : datetime.utcnow() + timedelta(minutes = 30)
+			'exp' : datetime.utcnow() + timedelta(minutes=30)
 		}, 
 		app.config['SECRET_KEY']
 		)
 
-		return make_response(jsonify({'token' : token.decode('UTF-8')}), 201)
+		return make_response(jsonify({'token': token.decode('UTF-8')}), 201)
 	# returns 403 if password is wrong
 	return make_response(
 		'Could not verify',
@@ -72,7 +76,9 @@ def login():
 	)
 
 # signup route
-@app.route('/signup', methods =['POST'])
+
+
+@app.route('/signup', methods=['POST'])
 def signup():
 	# creates a dictionary of the form data
 	data = request.form
@@ -83,15 +89,15 @@ def signup():
 
 	# checking for existing user
 	user = User.query\
-		.filter_by(email = email)\
+		.filter_by(email=email)\
 		.first()
 	if not user:
 		# database ORM object++++++
 		user = User(
-			public_id = str(uuid.uuid4()),
-			name = name,
-			email = email,
-			password = generate_password_hash(password)
+			public_id=str(uuid.uuid4()),
+			name=name,
+			email=email,
+			password=generate_password_hash(password)
 		)
 		# insert user
 		db.session.add(user)
@@ -102,8 +108,9 @@ def signup():
 		# returns 202 if user already exists
 		return make_response('User already exists. Please Log in.', 202)
 
+
 if __name__ == "__main__":
 	# setting debug to True enables hot reload
 	# and also provides a debugger shell
 	# if you hit an error while running the server
-	app.run(debug = True)
+	app.run(debug=True)
